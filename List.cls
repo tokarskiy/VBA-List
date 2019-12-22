@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.1
+''' List v0.1.1
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -20,8 +20,8 @@ Attribute VB_Description = "Represents a list of elements that can be accessed b
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
-#Const UseExcelObjects = False
-#Const UseDictionaryWin = False
+#Const UseExcelObjects = True
+#Const UseDictionaryWin = True
 #Const UseDictionaryMac = False
 
 #Const Win = Win16 Or Win32 Or Win64
@@ -312,6 +312,7 @@ End Function
 ''' @return {String}
 '''
 Public Function ToString(Optional ByVal Delimiter As String = " ") As String
+Attribute ToString.VB_Description = "Returns a String representing a List"
     Dim elems() As Variant
     Dim elem As Variant
     Dim i As Long
@@ -324,9 +325,11 @@ Public Function ToString(Optional ByVal Delimiter As String = " ") As String
     
     i = 1
     For Each elem In seq_pCollection
-        If IsObject(elem) Then
+        If VBA.IsObject(elem) Then
             If elem Is Me Then
                 elems(i) = "[THIS LIST]"
+            ElseIf elem Is Nothing Then
+                elems(i) = "Object{Nothing}"
             ElseIf TypeOf elem Is List Then
                 elems(i) = "[" & elem.ToString(Delimiter) & "]"
             Else
@@ -479,7 +482,7 @@ Attribute Distinct.VB_Description = "Returns distinct elements from the List"
     
     Set Distinct = New List
     Do While coll.Count <> 0
-        If IsObject(coll.Item(1)) Then
+        If VBA.IsObject(coll.Item(1)) Then
             Set elem = coll.Item(1)
         Else
             elem = coll.Item(1)
@@ -543,11 +546,16 @@ Attribute Sort.VB_Description = "Sorts the elements of a List in ascending order
     Dim arr() As Variant
     Dim elem As Variant
     Dim i As Long
+    If seq_pCollection.Count = 0 Then
+        Set Sort = New List
+        Exit Function
+    End If
+    
     ReDim arr(0 To seq_pCollection.Count - 1)
     
     i = 0
     For Each elem In seq_pCollection
-        If IsObject(elem) Then
+        If VBA.IsObject(elem) Then
             Set arr(i) = elem
         Else
             arr(i) = elem
@@ -584,11 +592,16 @@ Attribute SortDescending.VB_Description = "Sorts the elements of a List in desce
     Dim arr() As Variant
     Dim elem As Variant
     Dim i As Long
+    If seq_pCollection.Count = 0 Then
+        Set SortDescending = New List
+        Exit Function
+    End If
+    
     ReDim arr(0 To seq_pCollection.Count - 1)
     
     i = 0
     For Each elem In seq_pCollection
-        If IsObject(elem) Then
+        If VBA.IsObject(elem) Then
             Set arr(i) = elem
         Else
             arr(i) = elem
@@ -695,7 +708,7 @@ Private Sub QSort(Elements() As Variant, _
         l = collStart
         h = collEnd - 2
         
-        If IsObject(Elements(collSepar)) Then
+        If VBA.IsObject(Elements(collSepar)) Then
             Set piv = Elements(collSepar)
         Else
             piv = Elements(collSepar)
@@ -727,6 +740,9 @@ Private Sub QSort(Elements() As Variant, _
         stk.Add idx
         
 continueLoop:
+        If VBA.IsObject(piv) Then
+            Set piv = Nothing
+        End If
     Loop
     
     Set stk = Nothing
@@ -734,22 +750,26 @@ End Sub
 
 Private Sub SwapArrayElements(Elements() As Variant, ByVal Item1 As Long, ByVal Item2 As Long)
     Dim temp As Variant
-    If IsObject(Elements(Item1)) Then
+    If VBA.IsObject(Elements(Item1)) Then
         Set temp = Elements(Item1)
     Else
         temp = Elements(Item1)
     End If
     
-    If IsObject(Elements(Item2)) Then
+    If VBA.IsObject(Elements(Item2)) Then
         Set Elements(Item1) = Elements(Item2)
     Else
         Elements(Item1) = Elements(Item2)
     End If
     
-    If IsObject(temp) Then
+    If VBA.IsObject(temp) Then
         Set Elements(Item2) = temp
     Else
         Elements(Item2) = temp
+    End If
+    
+    If VBA.IsObject(temp) Then
+        Set temp = Nothing
     End If
 End Sub
 
