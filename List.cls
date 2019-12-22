@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.1.2
+''' List v0.1
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -421,13 +421,20 @@ End Function
 Public Function Filter(ByVal Predicate As String, Optional ByRef PredicateOwner As Object = Nothing) As List
 Attribute Filter.VB_Description = "Filters a sequence using a Predicate"
     Dim elem As Variant
-    
     Set Filter = New List
-    For Each elem In seq_pCollection
-        If CallFunction1(Predicate, PredicateOwner, elem) Then
-            Filter.Add elem
-        End If
-    Next elem
+    If PredicateOwner Is Nothing Then
+        For Each elem In seq_pCollection
+            If Application.Run(Predicate, elem) Then
+                Filter.Add elem
+            End If
+        Next elem
+    Else
+        For Each elem In seq_pCollection
+            If VBA.CallByName(PredicateOwner, Predicate, VBA.VbCallType.VbMethod, elem) Then
+                Filter.Add elem
+            End If
+        Next elem
+    End If
 End Function
 
 '''
@@ -440,11 +447,16 @@ End Function
 Public Function Map(ByVal Predicate As String, Optional ByRef PredicateOwner As Object = Nothing) As List
 Attribute Map.VB_Description = "Projects each element of a sequence using Predicate"
     Dim elem As Variant
-    
     Set Map = New List
-    For Each elem In seq_pCollection
-        Map.Add CallFunction1(Predicate, PredicateOwner, elem)
-    Next elem
+    If PredicateOwner Is Nothing Then
+        For Each elem In seq_pCollection
+            Map.Add Application.Run(Predicate, elem)
+        Next elem
+    Else
+        For Each elem In seq_pCollection
+            Map.Add VBA.CallByName(PredicateOwner, Predicate, VBA.VbCallType.VbMethod, elem)
+        Next elem
+    End If
 End Function
 
 '''
@@ -734,9 +746,9 @@ Private Sub QSort(Elements() As Variant, _
         SwapArrayElements Elements, collSepar, collEnd - 1
         
         Do While l < h
-            If CallFunction2(Predicate, PredicateOwner, Elements(l), piv) < 0 Then
+            If CallCompareFunction(Predicate, PredicateOwner, Elements(l), piv) < 0 Then
                 l = l + 1
-            ElseIf CallFunction2(Predicate, PredicateOwner, Elements(h), piv) >= 0 Then
+            ElseIf CallCompareFunction(Predicate, PredicateOwner, Elements(h), piv) >= 0 Then
                 h = h - 1
             Else
                 SwapArrayElements Elements, l, h
@@ -744,7 +756,7 @@ Private Sub QSort(Elements() As Variant, _
         Loop
         
         idx = h
-        If CallFunction2(Predicate, PredicateOwner, Elements(h), piv) < 0 Then
+        If CallCompareFunction(Predicate, PredicateOwner, Elements(h), piv) < 0 Then
             idx = idx + 1
         End If
         
@@ -790,34 +802,28 @@ Private Sub SwapArrayElements(Elements() As Variant, ByVal Item1 As Long, ByVal 
     End If
 End Sub
 
-Private Function CallFunction1(ByVal FunctionName As String, ByRef FunctionOwner As Object, Arg1 As Variant) As Variant
-    If FunctionName = vbNullString Then
-        CallFunction1 = True
-    ElseIf FunctionOwner Is Nothing Then
-        CallFunction1 = Application.Run(FunctionName, Arg1)
-    Else
-        CallFunction1 = VBA.CallByName(FunctionOwner, FunctionName, VbMethod, Arg1)
-    End If
-End Function
-
 Property Get NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = seq_pCollection.[_NewEnum]
 End Property
 
-Private Function CallFunction2(ByVal FunctionName As String, ByRef FunctionOwner As Object, Arg1 As Variant, Arg2 As Variant) As Variant
+Private Function CallCompareFunction(ByVal FunctionName As String, _
+                                     ByRef FunctionOwner As Object, _
+                                     Arg1 As Variant, _
+                                     Arg2 As Variant) As Variant
+
     If FunctionName = vbNullString Then
         If Arg1 > Arg2 Then
-            CallFunction2 = 1
+            CallCompareFunction = 1
         ElseIf Arg1 < Arg2 Then
-            CallFunction2 = -1
+            CallCompareFunction = -1
         Else
-            CallFunction2 = 0
+            CallCompareFunction = 0
         End If
     ElseIf FunctionOwner Is Nothing Then
-        CallFunction2 = Application.Run(FunctionName, Arg1, Arg2)
+        CallCompareFunction = Application.Run(FunctionName, Arg1, Arg2)
     Else
-        CallFunction2 = VBA.CallByName(FunctionOwner, FunctionName, VbMethod, Arg1, Arg2)
+        CallCompareFunction = VBA.CallByName(FunctionOwner, FunctionName, VBA.VbCallType.VbMethod, Arg1, Arg2)
     End If
 End Function
 
