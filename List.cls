@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.1.1
+''' List v0.1.2
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -20,8 +20,8 @@ Attribute VB_Description = "Represents a list of elements that can be accessed b
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
-#Const UseExcelObjects = True
-#Const UseDictionaryWin = True
+#Const UseExcelObjects = False
+#Const UseDictionaryWin = False
 #Const UseDictionaryMac = False
 
 #Const Win = Win16 Or Win32 Or Win64
@@ -312,7 +312,6 @@ End Function
 ''' @return {String}
 '''
 Public Function ToString(Optional ByVal Delimiter As String = " ") As String
-Attribute ToString.VB_Description = "Returns a String representing a List"
     Dim elems() As Variant
     Dim elem As Variant
     Dim i As Long
@@ -510,6 +509,29 @@ End Function
 '''
 Public Function Intersect(ByRef List As List) As List
 Attribute Intersect.VB_Description = "Produces the set intersection of two Lists"
+#If UseDictionary Then
+    Dim dict As Dictionary
+    Dim elem As Variant
+    
+    Set dict = New Dictionary
+    Set Intersect = New List
+    
+    If List Is Nothing Then
+        Exit Function
+    End If
+    
+    For Each elem In seq_pCollection
+        dict(elem) = True
+    Next elem
+    
+    For Each elem In List
+        If dict.Exists(elem) Then
+            Intersect.Add elem
+        End If
+    Next elem
+    
+    Set dict = Nothing
+#Else
     Dim elem As Variant
     
     Set Intersect = New List
@@ -523,13 +545,8 @@ Attribute Intersect.VB_Description = "Produces the set intersection of two Lists
         End If
     Next elem
     
-    For Each elem In List
-        If Me.Contains(elem) Then
-            Intersect.Add elem
-        End If
-    Next elem
-    
     Set Intersect = Intersect.Distinct()
+#End If
 End Function
 
 '''
