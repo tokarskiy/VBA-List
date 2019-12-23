@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.1.3
+''' List v0.1
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -669,6 +669,47 @@ Attribute SetElement.VB_Description = "Sets the element in the List by index"
 End Sub
 
 '''
+''' Computes the sum of numeric elements of the List
+'''
+''' @param {Variant}
+'''
+Public Function Sum() As Variant
+Attribute Sum.VB_Description = "Computes the sum of numeric elements of the List"
+    Dim elem As Variant
+    
+    Sum = 0
+    For Each elem In seq_pCollection
+        If VBA.IsNumeric(elem) Then
+            Sum = Sum + elem
+        End If
+    Next elem
+End Function
+
+'''
+''' Computes the average of numeric elements of the List
+'''
+''' @param {Double}
+'''
+Public Function Average() As Double
+Attribute Average.VB_Description = "Computes the average of numeric elements of the List"
+    Dim elem As Variant
+    Dim cnt As Double
+    
+    cnt = 0
+    For Each elem In seq_pCollection
+        If VBA.IsNumeric(elem) Then
+            cnt = cnt + 1
+        End If
+    Next elem
+    
+    For Each elem In seq_pCollection
+        If VBA.IsNumeric(elem) Then
+            Average = Average + elem / cnt
+        End If
+    Next elem
+End Function
+
+'''
 ''' Groups the List by specified key selector predicate function
 '''
 ''' @param {String} Predicate
@@ -823,7 +864,7 @@ Private Function CallCompareFunction(ByVal FunctionName As String, _
     ElseIf FunctionOwner Is Nothing Then
         CallCompareFunction = Application.Run(FunctionName, Arg1, Arg2)
     Else
-        CallCompareFunction = VBA.CallByName(FunctionOwner, FunctionName, VBA.VbCallType.VbMethod, Arg1, Arg2)
+        CallCompareFunction = VBA.CallByName(FunctionOwner, FunctionName, VbMethod, Arg1, Arg2)
     End If
 End Function
 
