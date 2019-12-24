@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.1.4
+''' List v0.1.5
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -562,6 +562,81 @@ Attribute Intersect.VB_Description = "Produces the set intersection of two Lists
 End Function
 
 '''
+''' Sorts the numeric elements of a List
+''' in ascending order
+'''
+''' @return {List}
+'''
+Public Function SortNumbers() As List
+Attribute SortNumbers.VB_Description = "Sorts the numeric elements of a List in ascending order"
+    Dim sz As Long
+    Dim elem As Variant
+    Dim i As Long
+    Dim arr() As Variant
+    ReDim arr(0 To seq_pCollection.Count - 1)
+    
+    i = 0
+    For Each elem In seq_pCollection
+        If VBA.IsNumeric(elem) Then
+            arr(i) = CDbl(elem)
+            i = i + 1
+        End If
+    Next elem
+    
+    sz = i
+    QSort Elements:=arr, _
+          IndexStart:=0, _
+          IndexEnd:=sz, _
+          Predicate:=vbNullString, _
+          PredicateOwner:=Nothing
+    
+    Set SortNumbers = New List
+    For i = 0 To sz - 1 Step 1
+        SortNumbers.Add arr(i)
+    Next i
+    
+    Erase arr
+End Function
+
+'''
+''' Sorts the elements of a List that can be converted to String
+''' in ascending alphabetical order
+'''
+''' @return {List}
+'''
+Public Function SortAlphabetically() As List
+Attribute SortAlphabetically.VB_Description = "Sorts the elements of a List that can be converted to String in ascending alphabetical order"
+    Dim sz As Long
+    Dim elem As Variant
+    Dim i As Long
+    Dim outStr As String
+    Dim arr() As Variant
+    ReDim arr(0 To seq_pCollection.Count - 1)
+    
+    i = 0
+    For Each elem In seq_pCollection
+        If TryConvertToString(elem, outStr) Then
+            arr(i) = outStr
+            i = i + 1
+        End If
+    Next elem
+    
+    sz = i
+    QSort Elements:=arr, _
+          IndexStart:=0, _
+          IndexEnd:=sz, _
+          Predicate:=vbNullString, _
+          PredicateOwner:=Nothing
+    
+    Set SortAlphabetically = New List
+    For i = 0 To sz - 1 Step 1
+        SortAlphabetically.Add arr(i)
+    Next i
+    
+    Erase arr
+End Function
+
+'''
 ''' Sorts the elements of a List in ascending order
 ''' by Predicate or by operators > and < if the Predicate
 ''' is not specified
@@ -671,7 +746,7 @@ End Sub
 '''
 ''' Computes the sum of numeric elements of the List
 '''
-''' @param {Variant}
+''' @return {Variant}
 '''
 Public Function Sum() As Variant
 Attribute Sum.VB_Description = "Computes the sum of numeric elements of the List"
@@ -688,7 +763,7 @@ End Function
 '''
 ''' Computes the average of numeric elements of the List
 '''
-''' @param {Double}
+''' @return {Double}
 '''
 Public Function Average() As Double
 Attribute Average.VB_Description = "Computes the average of numeric elements of the List"
@@ -707,6 +782,63 @@ Attribute Average.VB_Description = "Computes the average of numeric elements of 
             Average = Average + elem / cnt
         End If
     Next elem
+End Function
+
+'''
+''' Computes the percentile of numeric elements of the List
+'''
+''' @param {Double} Percent
+''' @return {Double}
+'''
+Public Function Percentile(ByVal Percent As Double) As Double
+Attribute Percentile.VB_Description = "Computes the percentile of numeric elements of the List"
+    Dim elem As Variant
+    Dim nums As List
+    Dim idx As Double
+    Dim idxRnd As Long
+    Dim linx As Long
+    Dim uinx As Long
+    
+    Set nums = New List
+    For Each elem In seq_pCollection
+        If VBA.IsNumeric(elem) Then
+            nums.Add CDbl(elem)
+        End If
+    Next elem
+    
+    If nums.IsEmpty() Then
+        Percentile = 0
+        Exit Function
+    End If
+    
+    Set nums = nums.Sort()
+    idx = CDbl((1 + nums.Count) * Percent)
+    idxRnd = CLng(VBA.Round(idx, 0))
+    If idxRnd > idx Then
+        idxRnd = idxRnd - 1
+    End If
+    
+    If idxRnd <> idx Then
+        linx = idxRnd
+        uinx = idxRnd + 1
+        
+        Percentile = nums(linx) / 2 + nums(uinx) / 2
+    Else
+        linx = idxRnd
+        Percentile = nums(linx)
+    End If
+    
+    Set nums = Nothing
+End Function
+
+'''
+''' Computes the median of numeric elements of the List
+'''
+''' @return {Double}
+'''
+Public Function Median() As Double
+Attribute Median.VB_Description = "Computes the median of numeric elements of the List"
+    Median = Percentile(0.5)
 End Function
 
 '''
@@ -745,6 +877,15 @@ Private Function GetDictCollectionOrAdd(ByRef Dictionary As Dictionary, Key As V
 End Function
 #End If
 
+Private Function TryConvertToString(Element As Variant, ByRef Result As String) As Boolean
+    On Error GoTo errorHandler
+    Result = CStr(Element)
+    TryConvertToString = True
+    Exit Function
+errorHandler:
+    TryConvertToString = False
+End Function
+
 Private Sub QSort(Elements() As Variant, _
                   ByVal IndexStart As Long, _
                   ByVal IndexEnd As Long, _
@@ -758,8 +899,8 @@ Private Sub QSort(Elements() As Variant, _
     
     Set stk = New VBA.Collection
       
-    stk.Add 0
-    stk.Add seq_pCollection.Count
+    stk.Add IndexStart
+    stk.Add IndexEnd
     
     Do While stk.Count <> 0
         collEnd = stk(stk.Count)
