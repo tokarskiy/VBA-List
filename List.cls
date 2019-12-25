@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.2
+''' List v0.2.2
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -869,42 +869,50 @@ End Function
 Public Function Percentile(ByVal Percent As Double) As Double
 Attribute Percentile.VB_Description = "Computes the percentile of numeric elements of the List"
     Dim elem As Variant
-    Dim nums As List
-    Dim idx As Double
-    Dim idxRnd As Long
-    Dim linx As Long
-    Dim uinx As Long
-    
-    Set nums = New List
-    For Each elem In seq_pCollection
-        If VBA.IsNumeric(elem) Then
-            nums.Add CDbl(elem)
-        End If
-    Next elem
-    
-    If nums.IsEmpty() Then
-        Percentile = 0
+    Dim nums As Collection
+    Dim r As Double
+    Dim ir As Long
+    Dim fr As Double
+    Dim num1 As Long
+    Dim num2 As Long
+    If Percent < 0 Or Percent > 1 Then
+        Err.Raise Number:=9 'Subscript out of range
         Exit Function
     End If
     
-    Set nums = nums.Sort()
-    idx = CDbl((1 + nums.Count) * Percent)
-    idxRnd = CLng(VBA.Round(idx, 0))
-    If idxRnd > idx Then
-        idxRnd = idxRnd - 1
+    Set nums = Me.SortNumbers().ToCollection()
+    If nums.Count = 0 Then
+        Percentile = 0
+        Exit Function
+    End If
+
+    If nums.Count = 1 Then
+        Percentile = nums.Item(1)
+        Exit Function
     End If
     
-    If idxRnd <> idx Then
-        linx = idxRnd
-        uinx = idxRnd + 1
-        
-        Percentile = nums(linx) / 2 + nums(uinx) / 2
-    Else
-        linx = idxRnd
-        Percentile = nums(linx)
+    r = CDbl((0 + nums.Count - 1) * Percent)
+    ir = CLng(VBA.Round(r, 0))
+    If ir > r Then
+        ir = ir - 1
     End If
     
+    fr = r - ir
+    num1 = nums.Item(ir + 1)
+    num2 = nums.Item(ir + 2)
+    
+    Percentile = num1 + (num2 - num1) * fr
     Set nums = Nothing
+End Function
+
+'''
+''' Returns number of a first element
+'''
+''' @return {Long}
+'''
+Public Function GetMinIndex() As Long
+Attribute GetMinIndex.VB_Description = "Returns number of a first element"
+    GetMinIndex = MinIndex
 End Function
 
 '''
