@@ -9,12 +9,12 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.1.5
+''' List v0.2
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
 '''
-''' Author : Andrew Tokarskiy tokarskiy.a@gmail.com
+''' Author : Andrew Tokarskiy <tokarskiy.a@gmail.com>
 ''' Github : https://github.com/tokarskiy
 ''' License: http://www.opensource.org/licenses/mit-license.php
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -75,6 +75,82 @@ Attribute Item.VB_UserMemId = 0
         Item = seq_pCollection.Item(collIndex)
     End If
 End Property
+
+'''
+''' Bypasses a specified number of elements in a List and
+''' then returns the remaining elements.
+'''
+''' @param {Long} Amount
+''' @return {List}
+'''
+Public Function Skip(ByVal Amount As Long) As List
+Attribute Skip.VB_Description = "Bypasses a specified number of elements in a List and then returns the remaining elements."
+    Dim elem As Variant
+    Dim i As Long
+    Set Skip = New List
+    
+    i = 1
+    For Each elem In seq_pCollection
+        If i > Amount Then
+            Skip.Add elem
+        End If
+        
+        i = i + 1
+    Next elem
+End Function
+
+'''
+''' Returns a specified number of contiguous elements
+''' from the start of a List.
+'''
+''' @param {Long} Amount
+''' @return {List}
+'''
+Public Function Take(ByVal Amount As Long) As List
+Attribute Take.VB_Description = "Returns a specified number of contiguous elements from the start of a List."
+    Dim elem As Variant
+    Dim i As Long
+    Set Take = New List
+    
+    i = 0
+    For Each elem In seq_pCollection
+        If i < Amount Then
+            i = i + 1
+            Take.Add elem
+        End If
+    Next elem
+End Function
+
+'''
+''' Retrieves a sublist from this List instance. The sublist starts at a
+''' specified element position and has a specified length.
+'''
+''' @param {Long} Start
+''' @param {Long} Length
+''' @return {List}
+'''
+Public Function SubList(ByVal Start As Long, ByVal Length As Long) As List
+Attribute SubList.VB_Description = "Retrieves a sublist from this List instance. The sublist starts at a specified element position and has a specified length."
+    Dim elem As Variant
+    Dim i As Long
+    Dim startCollIndex As Long
+    Dim endCollIndex As Long
+    
+    Set SubList = New List
+    startCollIndex = GetCollectionIndex(Start)
+    endCollIndex = VBA.IIf(startCollIndex + Length - 1 > seq_pCollection.Count, _
+                           seq_pCollection.Count, _
+                           startCollIndex + Length - 1)
+                               
+    If startCollIndex < 1 Or startCollIndex > seq_pCollection.Count Then
+        Err.Raise Number:=9 'Subscript out of range
+        Exit Function
+    End If
+    
+    For i = startCollIndex To endCollIndex Step 1
+        SubList.Add seq_pCollection.Item(i)
+    Next i
+End Function
 
 '''
 ''' Inserts an element to the List
@@ -849,7 +925,7 @@ End Function
 ''' @return {Dictionary}
 '''
 #If UseDictionary Then
-Public Function GroupBy(Optional ByVal Predicate As String = vbNullString, Optional ByRef PredicateOwner As Object = Nothing) As Dictionary
+Public Function GroupBy(ByVal Predicate As String, Optional ByRef PredicateOwner As Object = Nothing) As Dictionary
 Attribute GroupBy.VB_Description = "Groups the List by specified key selector predicate function"
     Dim elem As Variant
     Dim val As Variant
@@ -857,7 +933,11 @@ Attribute GroupBy.VB_Description = "Groups the List by specified key selector pr
     Set GroupBy = New Dictionary
     
     For Each elem In seq_pCollection
-        Set grpColl = GetDictCollectionOrAdd(GroupBy, CallFunction1(Predicate, PredicateOwner, elem))
+        If PredicateOwner Is Nothing Then
+            Set grpColl = GetDictCollectionOrAdd(GroupBy, Application.Run(Predicate, elem))
+        Else
+            Set grpColl = GetDictCollectionOrAdd(GroupBy, VBA.CallByName(PredicateOwner, Predicate, elem))
+        End If
         
         grpColl.Add elem
     Next elem
