@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.2.2
+''' List v0.2.3
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -817,6 +817,26 @@ Attribute SetElement.VB_Description = "Sets the element in the List by index"
 
     seq_pCollection.Add Value, After:=collIndex
     seq_pCollection.Remove collIndex
+End Sub
+
+'''
+''' Swaps positions of two List elements
+'''
+''' @param {Long} Index1
+''' @param {Long} Index2
+'''
+Public Sub Swap(ByVal Index1 As Long, ByVal Index2 As Long)
+Attribute Swap.VB_Description = "Swaps positions of two List elements"
+    Dim tmp As Variant
+    
+    If VBA.IsObject(Item(Index1)) Then
+        Set tmp = Item(Index1)
+    Else
+        tmp = Item(Index1)
+    End If
+    
+    SetElement Index1, Item(Index2)
+    SetElement Index2, tmp
 End Sub
 
 '''
