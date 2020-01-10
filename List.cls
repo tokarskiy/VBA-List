@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.2.3
+''' List v0.3.0
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -129,14 +129,14 @@ End Function
 ''' @param {Long} Length
 ''' @return {List}
 '''
-Public Function SubList(ByVal Start As Long, ByVal Length As Long) As List
-Attribute SubList.VB_Description = "Retrieves a sublist from this List instance. The sublist starts at a specified element position and has a specified length."
+Public Function Mid(ByVal Start As Long, ByVal Length As Long) As List
+Attribute Mid.VB_Description = "Retrieves a sublist from this List instance. The sublist starts at a specified element position and has a specified length."
     Dim elem As Variant
     Dim i As Long
     Dim startCollIndex As Long
     Dim endCollIndex As Long
     
-    Set SubList = New List
+    Set Mid = New List
     startCollIndex = GetCollectionIndex(Start)
     endCollIndex = VBA.IIf(startCollIndex + Length - 1 > seq_pCollection.Count, _
                            seq_pCollection.Count, _
@@ -148,8 +148,36 @@ Attribute SubList.VB_Description = "Retrieves a sublist from this List instance.
     End If
     
     For i = startCollIndex To endCollIndex Step 1
-        SubList.Add seq_pCollection.Item(i)
+        Mid.Add seq_pCollection.Item(i)
     Next i
+End Function
+
+'''
+''' Returns a specified number of contiguous elements
+''' from the start of a List.
+'''
+''' @param {Long} Amount
+''' @return {List}
+'''
+Public Function Left(ByVal Amount As Long) As List
+Attribute Left.VB_Description = "Returns a specified number of contiguous elements from the start of a List"
+    Set Left = Take(Amount)
+End Function
+
+'''
+''' Returns a specified number of contiguous elements
+''' from the end of a List.
+'''
+''' @param {Long} Amount
+''' @return {List}
+'''
+Public Function Right(ByVal Amount As Long) As List
+Attribute Right.VB_Description = "Returns a specified number of contiguous elements from the end of a List"
+    Set Right = Me.Copy()
+    
+    Do While Right.Count > Amount
+        Right.Remove MinIndex
+    Loop
 End Function
 
 '''
@@ -159,7 +187,7 @@ End Function
 ''' @param {Long} Before
 ''' @param {Long} After
 '''
-Public Sub Add(Element As Variant, Optional Before As Long = MinIndex - 1, Optional After As Long = MinIndex - 1)
+Public Sub Add(Element As Variant, Optional ByVal Before As Long = MinIndex - 1, Optional ByVal After As Long = MinIndex - 1)
 Attribute Add.VB_Description = "Inserts an element to the List"
     Dim collIndex As Long
     If After >= MinIndex Then
@@ -224,7 +252,7 @@ End Sub
 '''
 ''' Appends the elements of specified Excel Range to this List
 '''
-''' @param {Excel.Range} Sequence
+''' @param {Excel.Range} Range
 '''
 #If UseExcelObjects Then
 Public Sub AddRange(ByRef Range As Excel.Range)
@@ -242,7 +270,7 @@ End Sub
 '''
 ''' Appends the elements of specified array to this List
 '''
-''' @param {Variant} Sequence
+''' @param {Variant} Elements
 '''
 Public Sub AddArray(Elements As Variant)
 Attribute AddArray.VB_Description = "Appends the elements of specified array to this List"
@@ -271,7 +299,7 @@ End Function
 '''
 ''' Returns the index of a first element that equals to Parameter
 '''
-''' @param {Element} Variant
+''' @param {Variant} Element
 ''' @return {Long}
 '''
 Public Function IndexOf(Element As Variant) As Long
@@ -319,7 +347,7 @@ End Function
 '''
 ''' Returns the index of a last element that equals to Parameter
 '''
-''' @param {Element} Variant
+''' @param {Variant} Element
 ''' @return {Long}
 '''
 Public Function LastIndexOf(Element As Variant) As Long
@@ -388,6 +416,7 @@ End Function
 ''' @return {String}
 '''
 Public Function ToString(Optional ByVal Delimiter As String = " ") As String
+Attribute ToString.VB_Description = "Returns a String representing a List"
     Dim elems() As Variant
     Dim elem As Variant
     Dim i As Long
@@ -852,6 +881,52 @@ Attribute Sum.VB_Description = "Computes the sum of numeric elements of the List
     For Each elem In seq_pCollection
         If VBA.IsNumeric(elem) Then
             Sum = Sum + elem
+        End If
+    Next elem
+End Function
+
+'''
+''' Returns the minimum value
+'''
+''' @return {Variant}
+'''
+Public Function Min() As Variant
+Attribute Min.VB_Description = "Returns the minimum value"
+    Dim elem As Variant
+    Min = Empty
+    
+    For Each elem In seq_pCollection
+        If Not VBA.IsObject(elem) Then
+            If Min = Empty Then
+                Min = elem
+            Else
+                If Min > elem Then
+                    Min = elem
+                End If
+            End If
+        End If
+    Next elem
+End Function
+
+'''
+''' Returns the maximum value
+'''
+''' @return {Variant}
+'''
+Public Function Max() As Variant
+Attribute Min.VB_Description = "Returns the maximum value"
+    Dim elem As Variant
+    Max = Empty
+    
+    For Each elem In seq_pCollection
+        If Not VBA.IsObject(elem) Then
+            If Max = Empty Then
+                Max = elem
+            Else
+                If Max < elem Then
+                    Max = elem
+                End If
+            End If
         End If
     Next elem
 End Function
