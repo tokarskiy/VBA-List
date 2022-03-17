@@ -69,11 +69,13 @@ coll.Add 4
 Debug.Print coll.Left(2).ToString() ' 1 2
 Debug.Print coll.Right(2).ToString() ' 3 4
 Debug.Print coll.Mid(2, 2).ToString() ' 2 3
+Debug.Print coll.Take(3).ToString() ' 1 2 3
+Debug.Print coll.Skip(1).ToString() ' 2 3 4
 ```
 
 ### Checking for the existance of the element
 
-The method `Contains` returns `True` is case of existance of an argument in the list, otherwise `False`. The method `IndexOf` returns index of index of first occurence of the element in the list. `CountOf` returns amount of occurences of the argument in the list. 
+The method `Contains` returns `True` in case of existance of an argument in the list, otherwise `False`. The method `IndexOf` returns index of index of first occurence of the element in the list. `CountOf` returns amount of occurences of the argument in the list. 
 
 ```VB.net
 Dim coll As List
@@ -130,6 +132,7 @@ coll.Add 1
 coll.AddArray arr
 coll.AddList lst
 coll.AddCollection c
+coll.AddRange Sheet1.Range("A1:A100")
 ```
 
 ### Sorting
@@ -175,7 +178,7 @@ End Sub
 ''' comparer returns:
 '''  > 0 => x > y
 '''  = 0 => x = y
-'''  < 0 => x < y>
+'''  < 0 => x < y
 Private Function Lambda_Compare_Abs(ByVal x, ByVal y)
     Lambda_Compare_Abs = Abs(x) - Abs(y)
 End Function
@@ -193,7 +196,7 @@ End Function
 
 1. `UseExcelObjects` - if `True`, you will have an access to methods that manipulate with MS Excel objects, for example method `AddRange`. 
 2. `UseDictionaryWin` (Windows) and `UseDictionaryMac` (Mac) - if `True`, list will have some optimizations and an access to `GroupBy` method. Will be working correctly only if the project will have an access to `Dictionary` class. To to this, you may add reference to `Scripting.Dictionary` (Windows only) or import the [`VBA-Dictionary`](https://github.com/VBA-tools/VBA-Dictionary) class in your project (you can to this in Windows or Mac). 
-3. `MinIndex` - number of the first index. The most common values are `0` (C way) or `1` (Pascal way, also compatible with `VBA.Collection`). 
+3. `MinIndex` - number of the first index. The most common values are `0` (C way) or `1` (Pascal way). The default value is `1`, because it is also compatible with `VBA.Collection`. 
 
 ## License 
 
