@@ -3,7 +3,13 @@ VBA class that represents a list of elements that can be accessed by index. Prov
 
 ## Installation
 
-You should import the `List.cls` file to your project. 
+First of all, clone this repository.
+
+```
+git clone https://github.com/tokarskiy/VBA-List
+```
+
+Next, import the `List.cls` file to your project. 
 
 | Step 1               | Step 2               |
 |----------------------|----------------------|
