@@ -19,7 +19,7 @@ The list is compatible with standard `VBA.Collection` class, with one exception:
 
 Standard `VBA.Collection` does not allow you to change element by index. 
 
-```
+```VB.net
 Dim coll As VBA.Collection
 Set coll = New VBA.Collection
 
@@ -31,7 +31,7 @@ Let coll(1) = 3 ' Exception
 
 In `List` you are able to do this with `SetElement` method
 
-```
+```VB.net
 Dim coll As List
 Set coll = New List
 
@@ -45,7 +45,7 @@ coll.SetElement Index:=1, Value:=3
 
 `List` contains the `ToString` method allowing to represent the `List` as string, for example to output it via `Debug.Print` function
 
-```
+```VB.net
 Dim coll As List
 Set coll = New List
 
@@ -57,7 +57,7 @@ Debug.Print coll.ToString()
 
 ### Methods allowing to get sub-lists
 
-```
+```VB.net
 Dim coll As List
 Set coll = New List
 
@@ -75,7 +75,7 @@ Debug.Print coll.Mid(2, 2).ToString() ' 2 3
 
 The method `Contains` returns `True` is case of existance of an argument in the list, otherwise `False`. The method `IndexOf` returns index of index of first occurence of the element in the list. `CountOf` returns amount of occurences of the argument in the list. 
 
-```
+```VB.net
 Dim coll As List
 Set coll = New List
 
@@ -99,7 +99,7 @@ Debug.Print coll.CountOf(2) ' 1
 
 You can easily use the "for each" loop as with the `VBA.Collection` class.
 
-```
+```VB.net
 Dim coll As List
 Dim elem As Variant
 Set coll = New List
@@ -117,7 +117,7 @@ Next elem
 
 There are a lot of methods of adding the elements. You can add element by itself with `Add` method, an array with `AddArray` method, `Excel.Range` with `AddRange` method etc
 
-```
+```VB.net
 Dim arr() As String
 Dim lst As List
 Dim c As Collection
@@ -136,7 +136,7 @@ coll.AddCollection c
 
 It is possible to sort elements with `Sort` method. You can also use `SortDescending` to sort in descending order, `SortAlphabetically` to force sorting elements in alphabetical order (all elements casts to string), `SortNumbers` to force sorting numeric values (elements that impossible to cast to numbers will be ignored). 
 
-```
+```VB.net
 Dim lst As List
 Set lst = New List
 
@@ -153,7 +153,7 @@ Set sortedLst = lst.Sort()
 
 You can use `List` to use operators like `Map`, `Filter`, `Sort` (by your predicate). 
 
-```
+```VB.net
 Public Sub Process()
     Dim lst As List
     Set lst = New List
