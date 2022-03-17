@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Represents a list of elements that can be accessed by index. Provides methods to search, sort, and manipulate lists. \r\n\r\nAuthor: Andrew Tokarskiy tokarskiy.a@gmail.com \r\nGithub: https://github.com/tokarskiy \r\nLicense: http://www.opensource.org/licenses/mit-license.php"
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''' List v0.3.0
+''' List v0.4.0
 '''
 ''' Represents a list of elements that can be accessed by index.
 ''' Provides methods to search, sort and manipulate lists.
@@ -43,16 +43,16 @@ End Property
 '''
 ''' Returns the number that represents how many elements equal to the function parameter
 '''
-''' @param {Variant} Element
+''' @param {Variant} Item
 ''' @return {Long}
 '''
-Public Function CountOf(Element As Variant) As Long
+Public Function CountOf(Item As Variant) As Long
 Attribute CountOf.VB_Description = "Returns the number that represents how many elements equal to the function parameter"
     Dim elem As Variant
     
     CountOf = 0
     For Each elem In seq_pCollection
-        If ItemsEqual(elem, Element) Then
+        If ItemsEqual(elem, Item) Then
             CountOf = CountOf + 1
         End If
     Next elem
@@ -183,21 +183,21 @@ End Function
 '''
 ''' Inserts an element to the List
 '''
-''' @param {Variant} Element
+''' @param {Variant} Item
 ''' @param {Long} Before
 ''' @param {Long} After
 '''
-Public Sub Add(Element As Variant, Optional ByVal Before As Long = MinIndex - 1, Optional ByVal After As Long = MinIndex - 1)
+Public Sub Add(Item As Variant, Optional ByVal Before As Long = MinIndex - 1, Optional ByVal After As Long = MinIndex - 1)
 Attribute Add.VB_Description = "Inserts an element to the List"
     Dim collIndex As Long
     If After >= MinIndex Then
         collIndex = GetCollectionIndex(After)
-        seq_pCollection.Add Element, After:=collIndex
+        seq_pCollection.Add Item, After:=collIndex
     ElseIf Before >= MinIndex Then
         collIndex = GetCollectionIndex(Before)
-        seq_pCollection.Add Element, Before:=collIndex
+        seq_pCollection.Add Item, Before:=collIndex
     Else
-        seq_pCollection.Add Element
+        seq_pCollection.Add Item
     End If
 End Sub
 
@@ -288,28 +288,28 @@ End Sub
 '''
 ''' Determines whether any element of a List equals the Parameter
 '''
-''' @param {Variant} Element
+''' @param {Variant} Item
 ''' @return {Boolean}
 '''
-Public Function Contains(Element As Variant) As Boolean
+Public Function Contains(Item As Variant) As Boolean
 Attribute Contains.VB_Description = "Determines whether any element of a List equals the Parameter"
-    Contains = IndexOf(Element) >= MinIndex
+    Contains = IndexOf(Item) >= MinIndex
 End Function
 
 '''
 ''' Returns the index of a first element that equals to Parameter
 '''
-''' @param {Variant} Element
+''' @param {Variant} Item
 ''' @return {Long}
 '''
-Public Function IndexOf(Element As Variant) As Long
+Public Function IndexOf(Item As Variant) As Long
 Attribute IndexOf.VB_Description = "Returns the index of a first element that equals to Parameter"
     Dim i As Long
     Dim elem As Variant
     
     i = MinIndex
     For Each elem In seq_pCollection
-        If ItemsEqual(elem, Element) Then
+        If ItemsEqual(elem, Item) Then
             IndexOf = i
             Exit Function
         End If
@@ -347,10 +347,10 @@ End Function
 '''
 ''' Returns the index of a last element that equals to Parameter
 '''
-''' @param {Variant} Element
+''' @param {Variant} Item
 ''' @return {Long}
 '''
-Public Function LastIndexOf(Element As Variant) As Long
+Public Function LastIndexOf(Item As Variant) As Long
 Attribute LastIndexOf.VB_Description = "Returns the index of a last element that equals to Parameter"
     Dim i As Long
     Dim elem As Variant
@@ -358,7 +358,7 @@ Attribute LastIndexOf.VB_Description = "Returns the index of a last element that
     LastIndexOf = MinIndex - 1
     i = MinIndex
     For Each elem In seq_pCollection
-        If ItemsEqual(elem, Element) Then
+        If ItemsEqual(elem, Item) Then
             LastIndexOf = i
         End If
         
@@ -1060,9 +1060,9 @@ Private Function GetDictCollectionOrAdd(ByRef Dictionary As Dictionary, Key As V
 End Function
 #End If
 
-Private Function TryConvertToString(Element As Variant, ByRef Result As String) As Boolean
+Private Function TryConvertToString(Item As Variant, ByRef Result As String) As Boolean
     On Error GoTo errorHandler
-    Result = CStr(Element)
+    Result = CStr(Item)
     TryConvertToString = True
     Exit Function
 errorHandler:

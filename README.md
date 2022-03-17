@@ -13,7 +13,7 @@ You should import the `List.cls` file to your project.
 
 ### Compatibility with collections
 
-The list is compatible with standard `VBA.Collection` class, with one exeption: it is possible to use only `Integer`, `Long` etc numbers as indexes. 
+The list is compatible with standard `VBA.Collection` class, with one exception: it is possible to use only `Integer`, `Long` etc numbers as indexes. It is also impossible to use `List` as hash-table, so there's no `Key` argument in `Add` method. 
 
 ### Set item by index
 
@@ -29,7 +29,7 @@ coll.Add 2
 Let coll(1) = 3 ' Exception
 ```
 
-In `List` you are able to to this with `SetElement` method
+In `List` you are able to do this with `SetElement` method
 
 ```
 Dim coll As List
@@ -166,17 +166,21 @@ Public Sub Process()
     Dim processedLst As List
     Set processedLst = lst _
         .Sort(Predicate:="Module1.Lambda_Compare_Abs") _
-        .Map(Predicate:="Module1.Lambda_Sqr") _
+        .Map(Predicate:="Module1.Lambda_Map_Sqr") _
         .Filter(Predicate:="Module1.Lambda_Filter_More_Then_1")
         
     Debug.Print lst.ToString()
 End Sub
 
+''' comparer returns:
+'''  > 0 => x > y
+'''  = 0 => x = y
+'''  < 0 => x < y>
 Private Function Lambda_Compare_Abs(ByVal x, ByVal y)
     Lambda_Compare_Abs = Abs(x) - Abs(y)
 End Function
 
-Private Function Lambda_Sqr(ByVal x)
+Private Function Lambda_Map_Sqr(ByVal x)
     Lambda_Sqr = x * x
 End Function
 
