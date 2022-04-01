@@ -19,7 +19,7 @@ Next, import the `List.cls` file to your project.
 
 ### Compatibility with collections
 
-The list is compatible with standard `VBA.Collection` class, with one exception: it is possible to use only `Integer`, `Long` etc numbers as indexes. It is also impossible to use `List` as hash-table, so there's no `Key` argument in `Add` method. 
+The list is compatible with standard `VBA.Collection` class, with one exception: it is possible to use only integral numbers (`Integer`, `Long` etc) as indexes. It is also impossible to use `List` as hash-table, so there's no `Key` argument in `Add` method, use `Scripting.Dictionary` or [`VBA-Dictionary`](https://github.com/VBA-tools/VBA-Dictionary) instead. 
 
 ### Set item by index
 
@@ -79,7 +79,7 @@ Debug.Print coll.Take(3).ToString() ' 1 2 3
 Debug.Print coll.Skip(1).ToString() ' 2 3 4
 ```
 
-### Checking for the existance of the element
+### Checking for the existence of the element
 
 The method `Contains` returns `True` in case of existance of an argument in the list, otherwise `False`. The method `IndexOf` returns index of index of first occurence of the element in the list. `CountOf` returns amount of occurences of the argument in the list. 
 
@@ -105,7 +105,7 @@ Debug.Print coll.CountOf(2) ' 1
 
 ### For each loop
 
-You can easily use the "for each" loop as with the `VBA.Collection` class.
+You can easily use the "For Each" loop as with the `VBA.Collection` class.
 
 ```VB.net
 Dim coll As List
@@ -163,6 +163,7 @@ Set sortedLst = lst.Sort()
 You can use `List` to use operators like `Map`, `Filter`, `Sort` (by your predicate). 
 
 ```VB.net
+''''''''''''''''''''''''''''  Module1  ''''''''''''''''''''''''''''
 Public Sub Process()
     Dim lst As List
     Set lst = New List
