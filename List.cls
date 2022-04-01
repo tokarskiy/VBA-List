@@ -257,13 +257,22 @@ End Sub
 #If UseExcelObjects Then
 Public Sub AddRange(ByRef Range As Excel.Range)
 Attribute AddRange.VB_Description = "Appends the elements of specified Excel Range to this List"
-    Dim c As Object
+    Dim arr() As Variant
+    Dim i As Long
+    Dim j As Long
     
-    For Each c In Range
-        seq_pCollection.Add c.Value
-    Next c
+    If Range.Count > 1 Then
+        arr = Range.Value
+        For i = LBound(arr, 1) To UBound(arr, 1) Step 1
+            For j = LBound(arr, 2) To UBound(arr, 2) Step 1
+                seq_pCollection.Add arr(i, j)
+            Next j
+        Next i
+    ElseIf Range.Count = 1 Then
+        seq_pCollection.Add Range.Value
+    End If
     
-    Set c = Nothing
+    Erase arr
 End Sub
 #End If
 
