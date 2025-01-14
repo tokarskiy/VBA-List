@@ -528,7 +528,7 @@ End Function
 '''
 ''' Filters a sequence using Predicate
 '''
-''' @param {String} Predicate
+''' @param {String} Predicate Should be name of a function of type fn(Object) -> Boolean
 ''' @param {Object} PredicateOwner
 ''' @return {List}
 '''
@@ -552,23 +552,23 @@ Attribute Filter.VB_Description = "Filters a sequence using a Predicate"
 End Function
 
 '''
-''' Projects each element of a sequence using Predicate
+''' Projects each element of a sequence using Selector
 '''
-''' @param {String} Predicate
-''' @param {Object} PredicateOwner
+''' @param {String} Selector
+''' @param {Object} SelectorOwner
 ''' @return {List}
 '''
-Public Function Map(ByVal Predicate As String, Optional ByRef PredicateOwner As Object = Nothing) As List
-Attribute Map.VB_Description = "Projects each element of a sequence using Predicate"
+Public Function Map(ByVal Selector As String, Optional ByRef SelectorOwner As Object = Nothing) As List
+Attribute Map.VB_Description = "Projects each element of a sequence using Selector"
     Dim elem As Variant
     Set Map = New List
-    If PredicateOwner Is Nothing Then
+    If SelectorOwner Is Nothing Then
         For Each elem In seq_pCollection
-            Map.Add Application.Run(Predicate, elem)
+            Map.Add Application.Run(Selector, elem)
         Next elem
     Else
         For Each elem In seq_pCollection
-            Map.Add VBA.CallByName(PredicateOwner, Predicate, VBA.VbCallType.VbMethod, elem)
+            Map.Add VBA.CallByName(SelectorOwner, Selector, VBA.VbCallType.VbMethod, elem)
         Next elem
     End If
 End Function
@@ -701,8 +701,8 @@ Attribute SortNumbers.VB_Description = "Sorts the numeric elements of a List in 
     QSort Elements:=arr, _
           IndexStart:=0, _
           IndexEnd:=sz, _
-          Predicate:=vbNullString, _
-          PredicateOwner:=Nothing
+          Selector:=vbNullString, _
+          SelectorOwner:=Nothing
     
     Set SortNumbers = New List
     For i = 0 To sz - 1 Step 1
@@ -739,8 +739,8 @@ Attribute SortAlphabetically.VB_Description = "Sorts the elements of a List that
     QSort Elements:=arr, _
           IndexStart:=0, _
           IndexEnd:=sz, _
-          Predicate:=vbNullString, _
-          PredicateOwner:=Nothing
+          Selector:=vbNullString, _
+          SelectorOwner:=Nothing
     
     Set SortAlphabetically = New List
     For i = 0 To sz - 1 Step 1
@@ -752,15 +752,15 @@ End Function
 
 '''
 ''' Sorts the elements of a List in ascending order
-''' by Predicate or by operators > and < if the Predicate
+''' by Selector or by operators > and < if the Selector
 ''' is not specified
 '''
-''' @param {String} Predicate
-''' @param {Object} PredicateOwner
+''' @param {String} Selector
+''' @param {Object} SelectorOwner
 ''' @return {List}
 '''
-Public Function Sort(Optional ByVal Predicate As String = vbNullString, Optional ByRef PredicateOwner As Object = Nothing) As List
-Attribute Sort.VB_Description = "Sorts the elements of a List in ascending order by Predicate or by operators > and < if the Predicate is not specified"
+Public Function Sort(Optional ByVal Selector As String = vbNullString, Optional ByRef SelectorOwner As Object = Nothing) As List
+Attribute Sort.VB_Description = "Sorts the elements of a List in ascending order by Selector or by operators > and < if the Selector is not specified"
     Dim arr() As Variant
     Dim elem As Variant
     Dim i As Long
@@ -785,8 +785,8 @@ Attribute Sort.VB_Description = "Sorts the elements of a List in ascending order
     QSort Elements:=arr, _
           IndexStart:=0, _
           IndexEnd:=seq_pCollection.Count, _
-          Predicate:=Predicate, _
-          PredicateOwner:=PredicateOwner
+          Selector:=Selector, _
+          SelectorOwner:=SelectorOwner
     
     Set Sort = New List
     For i = 0 To seq_pCollection.Count - 1 Step 1
@@ -798,15 +798,15 @@ End Function
 
 '''
 ''' Sorts the elements of a List in descending order
-''' by Predicate or by operators > and < if the Predicate
+''' by Selector or by operators > and < if the Selector
 ''' is not specified
 '''
-''' @param {String} Predicate
-''' @param {Object} PredicateOwner
+''' @param {String} Selector
+''' @param {Object} SelectorOwner
 ''' @return {List}
 '''
-Public Function SortDescending(Optional ByVal Predicate As String = vbNullString, Optional ByRef PredicateOwner As Object = Nothing) As List
-Attribute SortDescending.VB_Description = "Sorts the elements of a List in descending order by Predicate or by operators > and < if the Predicate is not specified"
+Public Function SortDescending(Optional ByVal Selector As String = vbNullString, Optional ByRef SelectorOwner As Object = Nothing) As List
+Attribute SortDescending.VB_Description = "Sorts the elements of a List in descending order by Selector or by operators > and < if the Selector is not specified"
     Dim arr() As Variant
     Dim elem As Variant
     Dim i As Long
@@ -831,8 +831,8 @@ Attribute SortDescending.VB_Description = "Sorts the elements of a List in desce
     QSort Elements:=arr, _
           IndexStart:=0, _
           IndexEnd:=seq_pCollection.Count, _
-          Predicate:=Predicate, _
-          PredicateOwner:=PredicateOwner
+          Selector:=Selector, _
+          SelectorOwner:=SelectorOwner
     
     Set SortDescending = New List
     For i = seq_pCollection.Count - 1 To 0 Step -1
@@ -1030,25 +1030,25 @@ Attribute Median.VB_Description = "Computes the median of numeric elements of th
 End Function
 
 '''
-''' Groups the List by specified key selector predicate function
+''' Groups the List by specified key selector function
 '''
-''' @param {String} Predicate
-''' @param {Object} PredicateOwner
+''' @param {String} Selector
+''' @param {Object} SelectorOwner
 ''' @return {Dictionary}
 '''
 #If UseDictionary Then
-Public Function GroupBy(ByVal Predicate As String, Optional ByRef PredicateOwner As Object = Nothing) As Dictionary
-Attribute GroupBy.VB_Description = "Groups the List by specified key selector predicate function"
+Public Function GroupBy(ByVal Selector As String, Optional ByRef SelectorOwner As Object = Nothing) As Dictionary
+Attribute GroupBy.VB_Description = "Groups the List by specified key selector function"
     Dim elem As Variant
     Dim val As Variant
     Dim grpColl As List
     Set GroupBy = New Dictionary
     
     For Each elem In seq_pCollection
-        If PredicateOwner Is Nothing Then
-            Set grpColl = GetDictCollectionOrAdd(GroupBy, Application.Run(Predicate, elem))
+        If SelectorOwner Is Nothing Then
+            Set grpColl = GetDictCollectionOrAdd(GroupBy, Application.Run(Selector, elem))
         Else
-            Set grpColl = GetDictCollectionOrAdd(GroupBy, VBA.CallByName(PredicateOwner, Predicate, elem))
+            Set grpColl = GetDictCollectionOrAdd(GroupBy, VBA.CallByName(SelectorOwner, Selector, elem))
         End If
         
         grpColl.Add elem
@@ -1081,8 +1081,8 @@ End Function
 Private Sub QSort(Elements() As Variant, _
                   ByVal IndexStart As Long, _
                   ByVal IndexEnd As Long, _
-                  ByVal Predicate As String, _
-                  ByRef PredicateOwner As Object)
+                  ByVal Selector As String, _
+                  ByRef SelectorOwner As Object)
     
     Dim stk As VBA.Collection
     Dim collStart As Long
@@ -1120,9 +1120,9 @@ Private Sub QSort(Elements() As Variant, _
         SwapArrayElements Elements, collSepar, collEnd - 1
         
         Do While l < h
-            If CallCompareFunction(Predicate, PredicateOwner, Elements(l), piv) < 0 Then
+            If CallCompareFunction(Selector, SelectorOwner, Elements(l), piv) < 0 Then
                 l = l + 1
-            ElseIf CallCompareFunction(Predicate, PredicateOwner, Elements(h), piv) >= 0 Then
+            ElseIf CallCompareFunction(Selector, SelectorOwner, Elements(h), piv) >= 0 Then
                 h = h - 1
             Else
                 SwapArrayElements Elements, l, h
@@ -1130,7 +1130,7 @@ Private Sub QSort(Elements() As Variant, _
         Loop
         
         idx = h
-        If CallCompareFunction(Predicate, PredicateOwner, Elements(h), piv) < 0 Then
+        If CallCompareFunction(Selector, SelectorOwner, Elements(h), piv) < 0 Then
             idx = idx + 1
         End If
         
